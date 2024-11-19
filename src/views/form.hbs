@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<input type="hidden" value="{{HOST}}" id="host"/>
+<input type="hidden" value="{{HOST}}" id="host" />
 
 <!-- Script Section -->
 <script>
@@ -88,7 +88,7 @@
             const _HOST = $('#host').val();
             const fps = $('#fps').val();
             const videoFile = videoUpload[0].files[0]; // Ensure videoUpload is the correct file input element
-            
+
             if (!videoFile) {
                 alert('Please upload a video!');
                 return;
@@ -96,24 +96,32 @@
 
             // Create a FormData object to send the file and fps
             let formData = new FormData();
-            formData.append('video', videoFile); 
+            formData.append('video', videoFile);
             formData.append('fps', fps);
 
             $.ajax({
                 url: `${_HOST}/api/convertor/convert`, // Your API endpoint
                 method: "POST",
                 data: formData,
-                processData: false, 
-                contentType: false, 
-                success: function (response) {
-                    console.log("Upload response:", response);
-                    alert("Video uploaded successfully.");
-                    $("#upload-btn").text("Upload Video").prop("disabled", false);
+                processData: false,
+                contentType: false,
+                xhrFields: {
+                    responseType: 'blob'
+                }, 
+                success: function (data) {
+                    const url = window.URL.createObjectURL(data);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'downloaded-file.pdf'; // Desired file name
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Revoke the Blob URL to free memory
+                    window.URL.revokeObjectURL(url);
                 },
-                error: function (error) {
-                    console.error("Error uploading video:", error);
-                    alert("Error uploading the video.");
-                    $("#upload-btn").text("Upload Video").prop("disabled", false);
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error downloading PDF:', textStatus, errorThrown);
                 },
             });
         });
