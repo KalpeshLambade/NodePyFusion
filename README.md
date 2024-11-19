@@ -1,4 +1,4 @@
-# Video to PDF Conversion Project
+# Video to PDF Conversion 
 
 ## Overview
 This project converts video files into PDF documents. It extracts frames from a video, generates images, and compiles them into a PDF file. The project leverages **Node.js** and **Express** for the backend API and uses **Python** scripts for intensive tasks like frame extraction and PDF creation, demonstrating a seamless integration between Node.js and Python.
