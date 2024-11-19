@@ -1,0 +1,35 @@
+{
+  "name": "videoconvertor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && npm run copy-views && npm run copy-public",
+    "start": "concurrently \"npm run build\" \"node dist/index.js\"",
+    "copy-views": "cp -r src/views dist/",
+    "copy-public": "cp -r src/public dist/",
+    "views-watch": "chokidar \"src/**/*.hbs\" \"src/public/*/.*\" -c \"npm run copy-views && npm run copy-public\"",
+    "twatch": "tsc-watch --onSuccess \"nodemon ./dist/index.js\"",
+    "dev": "concurrently \"npm run twatch\" \"npm run views-watch\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.0",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.1.0",
+    "nodemon": "^3.1.7",
+    "tsc-watch": "^6.2.1",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-handlebars": "^8.0.1"
+  }
+}
