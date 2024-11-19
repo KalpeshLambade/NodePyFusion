@@ -1,13 +1,122 @@
-<div>
-    <h1 class="text-3xl font-bold underline">
-        Hello world!
-    </h1>
+<div class="min-h-screen bg-sky-900 flex justify-center items-center py-8">
+    <!-- Container for content -->
+    <div class="w-full max-w-lg bg-blue-300 rounded-lg shadow-lg p-6">
+        <!-- Heading Section -->
+        <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-6">Convert Video to Image</h1>
+
+        <!-- Video Upload and FPS Input Form -->
+        <div>
+            <!-- Video Drag and Drop Upload -->
+            <div class="mb-4">
+                <label for="video-upload" class="block text-lg font-medium text-gray-700">Upload Video (Drag and
+                    Drop)</label>
+                <div id="drop-area" class="border-4 border-dashed border-gray-300 p-6 rounded-lg text-center">
+                    <p class="text-gray-500 mb-2">Drag and drop your video file here, or click to select</p>
+                    <input id="video-upload" type="file" accept="video/*" class="hidden" />
+                    <button id="select-video"
+                        class="mt-2 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Select Video
+                    </button>
+                </div>
+                <p id="upload-status" class="mt-2 text-gray-500 text-center hidden">Video file selected!</p>
+            </div>
+
+            <!-- FPS Input -->
+            <div class="mb-4">
+                <label for="fps" class="block text-lg font-medium text-gray-700">Frames Per Second (FPS)</label>
+                <input id="fps" type="number" min="1" value="24" class="mt-2 p-2 border rounded-md w-full text-gray-700"
+                    placeholder="Set FPS (Default: 24)" />
+            </div>
+
+            <!-- Convert Button -->
+            <button id="convert-btn" class="w-full py-3 bg-green-600 text-white rounded-md text-xl hover:bg-green-700">
+                Convert Video to Images
+            </button>
+        </div>
+    </div>
 </div>
 
+<input type="hidden" value="{{HOST}}" id="host"/>
+
+<!-- Script Section -->
 <script>
     $(document).ready(function () {
-        console.log(9)
+        // Handle drag and drop video upload
+        const dropArea = $('#drop-area');
+        const videoUpload = $('#video-upload');
+        const selectVideoBtn = $('#select-video');
+        const uploadStatus = $('#upload-status');
 
+        // Trigger file selection dialog when select video button is clicked
+        selectVideoBtn.on('click', function () {
+            videoUpload.click();
+        });
+
+        // Handle video file selection
+        videoUpload.on('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadStatus.text(`Video file selected: ${file.name}`).removeClass('hidden');
+            } else {
+                uploadStatus.addClass('hidden');
+            }
+        });
+
+        // Handle drag and drop events
+        dropArea.on('dragover', function (event) {
+            event.preventDefault();
+            dropArea.addClass('border-blue-500');
+        });
+
+        dropArea.on('dragleave', function (event) {
+            event.preventDefault();
+            dropArea.removeClass('border-blue-500');
+        });
+
+        dropArea.on('drop', function (event) {
+            event.preventDefault();
+            dropArea.removeClass('border-blue-500');
+            const file = event.originalEvent.dataTransfer.files[0];
+            if (file && file.type.startsWith('video/')) {
+                videoUpload[0].files = event.originalEvent.dataTransfer.files;
+                uploadStatus.text(`Video file selected: ${file.name}`).removeClass('hidden');
+            }
+        });
+
+        // Handle Convert Button Click
+        $('#convert-btn').on('click', function () {
+            const _HOST = $('#host').val();
+            const fps = $('#fps').val();
+            const videoFile = videoUpload[0].files[0]; // Ensure videoUpload is the correct file input element
+            
+            if (!videoFile) {
+                alert('Please upload a video!');
+                return;
+            }
+
+            // Create a FormData object to send the file and fps
+            let formData = new FormData();
+            formData.append('video', videoFile); 
+            formData.append('fps', fps);
+
+            $.ajax({
+                url: `${_HOST}/api/convertor/convert`, // Your API endpoint
+                method: "POST",
+                data: formData,
+                processData: false, 
+                contentType: false, 
+                success: function (response) {
+                    console.log("Upload response:", response);
+                    alert("Video uploaded successfully.");
+                    $("#upload-btn").text("Upload Video").prop("disabled", false);
+                },
+                error: function (error) {
+                    console.error("Error uploading video:", error);
+                    alert("Error uploading the video.");
+                    $("#upload-btn").text("Upload Video").prop("disabled", false);
+                },
+            });
+        });
 
     });
 </script>
